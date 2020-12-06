@@ -1,5 +1,8 @@
 
 //var clock = new THREE.Clock();
+
+var H=150;
+var B=150;
 var camLock = false;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -34,7 +37,41 @@ floor.rotation.x = Math.PI/2;
 scene.add( floor );
 
 
+var FizzyText = function() {
+  // Sets up inital values for the sliders
+  this.PyraBase = 150;
+  this.PyraHeight = 150
+  this.BoxRot = 0
 
+
+
+}
+
+var text = new FizzyText();
+var gui = new dat.GUI();
+var PyraBase = gui.add(text, 'PyraBase', 0, 300).step(5);
+var PyraHeight = gui.add(text, 'PyraHeight', 0, 300).step(5);
+var BoxRot = gui.add(text, 'BoxRot', 0, 360).step(10);
+
+
+
+	
+PyraBase.onChange(function(value) {
+	PyraBase = value;
+	B = value;
+	
+});
+PyraHeight.onChange(function(value) {
+	PyraHeight = value;
+	H = value;
+});
+BoxRot.onChange(function(value) {
+	BoxRot = value;
+});
+
+
+
+	// First call to main on page load with ALL set to 0
 
 
 // //WALL?
@@ -119,34 +156,35 @@ scene.add( floor );
 // wall3.translate(250,2,0.1)
 // scene.add( wall3 );
 
-var geometry = new THREE.CylinderGeometry(0, 150, 150, 4, 1)
+var geometry = new THREE.CylinderGeometry(0, B, H, 4, 1)
 var material = new THREE.MeshNormalMaterial();
 var pyramid = new THREE.Mesh(geometry, material);
 
 
-const wireframe = new THREE.WireframeGeometry( geometry );
-
-const line = new THREE.LineSegments( wireframe );
-line.material.depthTest = false;
-line.material.opacity = 1;
-line.material.transparent = true;
-
-line.material =  new THREE.LineBasicMaterial( {
+pyramid.material =  new THREE.LineBasicMaterial( {
 	color: 0xDCFF00});
 
 
-// var modifier = new SubdivisionModifier( 2 ); // Number of subdivisions
 
-// modifier.modify( line );
+scene.add(pyramid);
 
-// scene.add( line );
+const light = new THREE.AmbientLight( 0xFF0000 ); // light
+scene.add( light );
 
-//scene.add(pyramid);
+//add in option to toggle
+const spotLight = new THREE.SpotLight( 0xffffff );
+spotLight.position.set( 100, 1000, 100 );
 
+spotLight.castShadow = true;
 
+spotLight.shadow.mapSize.width = 1024;
+spotLight.shadow.mapSize.height = 1024;
 
+spotLight.shadow.camera.near = 500;
+spotLight.shadow.camera.far = 4000;
+spotLight.shadow.camera.fov = 30;
 
-
+scene.add( spotLight );
 
 //Initial
 camera.position.x= 60;
@@ -161,33 +199,20 @@ var firstCam = new THREE.FirstPersonControls(camera,renderer.domElement);
 firstCam.lookSpeed = 0.05;
 firstCam.movementSpeed = 10;
 
-	this.onKeyDown = function ( event ) {
+//Toggle rotation
+const geometry2 = new THREE.BoxBufferGeometry( 1, 1, 1 );
+const material2 = new THREE.MeshBasicMaterial( { color: 0x00FFFF } );
+const mesh = new THREE.Mesh( geometry2, material2 );
+scene.add( mesh );
+//fix sliders
+//mesh.rotation.x = BoxRot
+//mesh.rotation.y = BoxRot
 
-		//event.preventDefault();
-
-		switch ( event.keyCode ) {
-
-			case 75: camLock = !camLock; break; /*LOCKCAM*/
-
-
-		}
-
-	};
 function render() {
 	firstCam.update(clock.getDelta());
 	renderer.clear();
 	requestAnimationFrame( render );
 	renderer.render(scene, camera)
 }
-function otherRender() {
-	renderer.clear();
-	requestAnimationFrame( render );
-}
-if (camLock)
-{
-otherRender();
-}
-else
-{
+
 render();
-}
