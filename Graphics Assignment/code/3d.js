@@ -1,8 +1,8 @@
 
 //var clock = new THREE.Clock();
 
-var H=150;
-var B=150;
+var tess=10;
+var R = 0;
 var camLock = false;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -39,34 +39,24 @@ scene.add( floor );
 
 var FizzyText = function() {
   // Sets up inital values for the sliders
-  this.PyraBase = 150;
-  this.PyraHeight = 150
+  this.SphereSplits = 10;
   this.BoxRot = 0
-
-
-
 }
 
 var text = new FizzyText();
 var gui = new dat.GUI();
-var PyraBase = gui.add(text, 'PyraBase', 0, 300).step(5);
-var PyraHeight = gui.add(text, 'PyraHeight', 0, 300).step(5);
+var SphereSplits = gui.add(text, 'SphereSplits', 0, 30).step(5);
 var BoxRot = gui.add(text, 'BoxRot', 0, 360).step(10);
 
 
-
+SphereSplits.onChange(function(value) {
+	SphereSplits = value;
+	tess = value;
 	
-PyraBase.onChange(function(value) {
-	PyraBase = value;
-	B = value;
-	
-});
-PyraHeight.onChange(function(value) {
-	PyraHeight = value;
-	H = value;
 });
 BoxRot.onChange(function(value) {
 	BoxRot = value;
+	R=value
 });
 
 
@@ -156,17 +146,20 @@ BoxRot.onChange(function(value) {
 // wall3.translate(250,2,0.1)
 // scene.add( wall3 );
 
-var geometry = new THREE.CylinderGeometry(0, B, H, 4, 1)
+
+
+var geometry = new THREE.CylinderGeometry(0, 150, 150, 4, 1)
+
 var material = new THREE.MeshNormalMaterial();
 var pyramid = new THREE.Mesh(geometry, material);
 
-
-pyramid.material =  new THREE.LineBasicMaterial( {
-	color: 0xDCFF00});
-
-
-
 scene.add(pyramid);
+
+
+pyramid.position.x=-200
+pyramid.position.y=10
+pyramid.position.z=10
+
 
 const light = new THREE.AmbientLight( 0xFF0000 ); // light
 scene.add( light );
@@ -182,7 +175,7 @@ spotLight.shadow.mapSize.height = 1024;
 
 spotLight.shadow.camera.near = 500;
 spotLight.shadow.camera.far = 4000;
-spotLight.shadow.camera.fov = 30;
+spotLight.shadow.camera.fov = 100000;
 
 scene.add( spotLight );
 
@@ -199,20 +192,50 @@ var firstCam = new THREE.FirstPersonControls(camera,renderer.domElement);
 firstCam.lookSpeed = 0.05;
 firstCam.movementSpeed = 10;
 
+var sphGeo = new THREE.SphereGeometry(40, 10, tess); //update second 10
+var sphMat = new THREE.MeshBasicMaterial({
+  color: 0xF3A2B0,
+  wireframe: true
+});
+
+var wireSphere = new THREE.Mesh(sphGeo,sphMat)
+scene.add(wireSphere)
+
+
+wireSphere.position.y = 40
+//var modifier = new THREE.SubdivisionModifier( 9 );
+//modifier.modify( geometry ); 
+
+
 //Toggle rotation
-const geometry2 = new THREE.BoxBufferGeometry( 1, 1, 1 );
-const material2 = new THREE.MeshBasicMaterial( { color: 0x00FFFF } );
+const geometry2 = new THREE.BoxBufferGeometry( 100, 150, 10 );
+const material2 = new THREE.MeshNormalMaterial();
 const mesh = new THREE.Mesh( geometry2, material2 );
 scene.add( mesh );
-//fix sliders
-//mesh.rotation.x = BoxRot
-//mesh.rotation.y = BoxRot
 
+mesh.position.x=200
+mesh.position.y=80
+mesh.position.z=10
+//fix sliders
 function render() {
 	firstCam.update(clock.getDelta());
 	renderer.clear();
-	requestAnimationFrame( render );
-	renderer.render(scene, camera)
-}
 
+
+
+	mesh.rotation.x = R
+	mesh.rotation.y = R
+
+	wireSphere.rotation.x+=0.01;
+	wireSphere.rotation.y+=0.01;
+
+
+	//UPDATE SPHERE GEO
+
+	//UPDATE LIGHTS
+
+  	requestAnimationFrame(render);
+  	renderer.render(scene, camera)
+}
 render();
+
