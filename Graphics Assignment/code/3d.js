@@ -152,7 +152,8 @@ var geometry = new THREE.CylinderGeometry(0, 150, 150, 4, 1)
 
 var material = new THREE.MeshNormalMaterial();
 var pyramid = new THREE.Mesh(geometry, material);
-
+const texture = new THREE.TextureLoader().load('../lib/1e851cb8c77eb0db27ba55070ff05d4a.jpg')
+pyramid.material =  new THREE.MeshBasicMaterial( {map: texture});
 scene.add(pyramid);
 
 
@@ -161,7 +162,7 @@ pyramid.position.y=10
 pyramid.position.z=10
 
 
-const light = new THREE.AmbientLight( 0xFF0000 ); // light
+const light = new THREE.AmbientLight( 0xFFFF00, 1.5 ); // light
 scene.add( light );
 
 //add in option to toggle
@@ -185,6 +186,34 @@ camera.position.y= 70;
 camera.position.z= -40;
 camera.lookAt(scene.position);
 
+var objloader=new THREE.OBJLoader();
+objloader.setPath('../lib/');
+objloader.load('tree.obj', function(object){
+	object.scale.x=object.scale.y=object.scale.z=30;
+	object.position.z=-50;
+	scene.add(object);
+});
+var mtlloader=new THREE.MTLLoader();
+mtlloader.setPath('../lib/');
+mtlloader.load('Touareg.mtl', function(materials){
+	materials.preload();
+	var objloader2=new THREE.OBJLoader();
+	objloader2.setMaterials(materials);
+	objloader2.setPath('../lib/');
+	objloader2.load('Touareg.obj', function(object2){
+		object2.scale.x=object2.scale.y=object2.scale.z=0.01;
+		object2.position.x=-50;
+		object2.position.z=50;
+		scene.add(object2);
+	});
+});
+
+var objloader3=new THREE.OBJLoader();
+objloader3.setPath('../lib/');
+objloader3.load('IronMan.obj', function(object3){
+	object3.scale.x=object3.scale.y=object3.scale.z=0.1;
+	scene.add(object3);
+});
 
 var clock = new THREE.Clock();
 var firstCam = new THREE.FirstPersonControls(camera,renderer.domElement);
