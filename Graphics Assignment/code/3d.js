@@ -162,8 +162,16 @@ pyramid.position.y=10
 pyramid.position.z=10
 
 
-const light = new THREE.AmbientLight( 0xFFFF00, 1.5 ); // light
+const light = new THREE.AmbientLight( 0xFFFFFF, 0.5 ); // light
 scene.add( light );
+
+const Plight1= new THREE.PointLight(0xFF0000, 0.5, 50);
+scene.add( Plight1 );
+const Plight2= new THREE.PointLight(0x00FF00, 0.5, 50);
+scene.add( Plight2 );
+const Plight3= new THREE.PointLight(0x0000FF, 0.5, 50);
+scene.add( Plight3 );
+
 
 //add in option to toggle
 const spotLight = new THREE.SpotLight( 0xffffff );
