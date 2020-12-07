@@ -1,10 +1,16 @@
 
 //var clock = new THREE.Clock();
-
-var tess=10;
+var spotvist =true;
+var pointvis1 =true;
+var pointvis2 =true;
+var pointvis3 =true;
 var R = 0;
 var camLock = false;
 const scene = new THREE.Scene();
+const Tex=new THREE.TextureLoader()
+Tex.load('../lib/ProceduralClouds_featured-1.jpg', function(Tex){
+	scene.background=Tex;
+});
 const camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 1000 );
 camera.lookAt( -2.5, 2, 0.1 );
 
@@ -38,26 +44,44 @@ scene.add( floor );
 
 
 var FizzyText = function() {
-  // Sets up inital values for the sliders
-  this.SphereSplits = 10;
-  this.BoxRot = 0
-}
+	// Sets up inital values for the sliders
+	  this.spotvist = true;
+	  this.pointvis1 = true;
+	  this.pointvis2 = true;
+	  this.pointvis3 = true;
+	this.BoxRot = 0
+  }
 
-var text = new FizzyText();
-var gui = new dat.GUI();
-var SphereSplits = gui.add(text, 'SphereSplits', 0, 30).step(5);
-var BoxRot = gui.add(text, 'BoxRot', 0, 360).step(10);
+  var text = new FizzyText();
+  var gui = new dat.GUI();
+  var spotvist = gui.add(text, 'spotvist')
+  var pointvis1 = gui.add(text, 'pointvis1')
+  var pointvis2 = gui.add(text, 'pointvis2')
+  var pointvis3 = gui.add(text, 'pointvis3')
+  var BoxRot = gui.add(text, 'BoxRot', 0, 360).step(10);
 
 
-SphereSplits.onChange(function(value) {
-	SphereSplits = value;
-	tess = value;
+  spotvist.onChange(function(value) {
+	spotvist = value;
+	
+});
+pointvis1.onChange(function(value) {
+	pointvis1 = value;
+	
+});
+pointvis2.onChange(function(value) {
+	pointvis2 = value;
+	
+});
+pointvis3.onChange(function(value) {
+	pointvis3 = value;
 	
 });
 BoxRot.onChange(function(value) {
 	BoxRot = value;
 	R=value
 });
+
 
 
 
@@ -216,11 +240,17 @@ mtlloader.load('Touareg.mtl', function(materials){
 	});
 });
 
-var objloader3=new THREE.OBJLoader();
-objloader3.setPath('../lib/');
-objloader3.load('IronMan.obj', function(object3){
-	object3.scale.x=object3.scale.y=object3.scale.z=0.1;
-	scene.add(object3);
+var mtlloader=new THREE.MTLLoader();
+mtlloader.setPath('../lib/');
+mtlloader.load('IronMan.mtl', function(materials){
+	materials.preload();
+	var objloader3=new THREE.OBJLoader();
+	objloader3.setMaterials(materials);
+	objloader3.setPath('../lib/');
+	objloader3.load('IronMan.obj', function(object3){
+		object3.scale.x=object3.scale.y=object3.scale.z=0.1;
+		scene.add(object3);
+	});
 });
 
 var clock = new THREE.Clock();
@@ -229,7 +259,7 @@ var firstCam = new THREE.FirstPersonControls(camera,renderer.domElement);
 firstCam.lookSpeed = 0.05;
 firstCam.movementSpeed = 10;
 
-var sphGeo = new THREE.SphereGeometry(40, 10, tess); //update second 10
+var sphGeo = new THREE.SphereGeometry(40, 10, 25); //update second 10
 var sphMat = new THREE.MeshBasicMaterial({
   color: 0xF3A2B0,
   wireframe: true
@@ -265,6 +295,14 @@ function render() {
 
 	wireSphere.rotation.x+=0.01;
 	wireSphere.rotation.y+=0.01;
+
+
+
+	Plight1.visible = pointvis1
+	Plight2.visible = pointvis2
+	Plight3.visible = pointvis3
+
+	spotLight.visible = spotvist
 
 
 	//UPDATE SPHERE GEO
